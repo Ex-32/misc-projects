@@ -1,0 +1,13 @@
+.vs
+.vscode
+*.code-workspace
+
+out*
+build*
+target*
+
+.venv
+__pycache__
+*.pyc
+*.pyo
+
