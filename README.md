@@ -8,6 +8,7 @@ project directory.
 ## projects
 - echo (asm)
 - echo (c)
+- simple_malloc (c)
 - snake (python)
 
 ## license
