@@ -43,26 +43,6 @@ size_t g_pagesize = 0;
 FreeNode* g_list_front = NULL;
 FreeNode* g_list_back  = NULL;
 
-void print_node(FreeNode* node) {
-    printf("node: %p\n"
-            "    size: %lu\n"
-            "    prev: %p\n"
-            "    next: %p\n",
-            node,
-            node->size,
-            node->prev,
-            node->next);
-}
-
-void print_tree() {
-    FreeNode* node = g_list_front;
-    for (;;) {
-        print_node(node);
-        if (node->next == NULL) break;
-        node = node->next;
-    }
-}
-
 void append_node(FreeNode* node) {
     if (g_list_front == NULL && g_list_back == NULL) {
         node->next = NULL;
@@ -84,8 +64,6 @@ int new_pages(size_t size) {
 
     size_t size_page_aligned = ((size + (g_pagesize - 1)) / g_pagesize) * g_pagesize;
 
-    printf("new pages size: %lu\n", size_page_aligned);
-
     void* pages = mmap(NULL, size_page_aligned, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     if (pages == MAP_FAILED) return 1;
 
@@ -103,10 +81,7 @@ void* simple_malloc(size_t n) {
     else size = ((size + (8 - 1)) / 8) * 8;
     size += sizeof(size_t);
 
-    printf("allocation size: %lu\n", size);
-
     if (g_list_front == NULL) {
-        printf("free list empty, getting new pages\n");
         if (new_pages(size) != 0) return NULL;
     }
 
@@ -126,7 +101,6 @@ void* simple_malloc(size_t n) {
         new_node->size = node->size - size;
         node->size = size;
         append_node(new_node);
-        printf("trimmed node size\n");
     }
 
     FreeNode* prev_node = node->prev;
@@ -150,11 +124,11 @@ void* simple_malloc(size_t n) {
 }
 
 void simple_free(void* ptr) {
-    printf("ptr: %p\n", ptr);
+    if (ptr == NULL) return;
+
     FreeNode* node = (FreeNode*)((size_t)ptr-sizeof(size_t));
     node->prev = NULL;
     node->next = NULL;
-    printf("node: %p\n", node);
 
     if (g_list_front == NULL) {
         g_list_front = node;
@@ -165,7 +139,6 @@ void simple_free(void* ptr) {
         FreeNode* list_node = g_list_front;
         for (;;) {
             if (((size_t)list_node)+((size_t)list_node->size) == (size_t)node) {
-                printf("found contiguous block to left\n");
                 list_node->size += node->size;
                 node = list_node;
                 break;
@@ -181,7 +154,6 @@ void simple_free(void* ptr) {
         FreeNode* list_node = g_list_front;
         for (;;) {
             if (end_addr == (size_t)list_node) {
-                printf("found contiguous block to right\n");
                 node->size += list_node->size;
 
                 FreeNode* prev_node = list_node->prev;
