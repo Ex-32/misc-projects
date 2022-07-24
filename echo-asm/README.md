@@ -1,5 +1,5 @@
 # echo (asm)
 
-This is an implementaion of the basic POSIX comand `echo` (it lacks the special
-formatting options the GNU version has) written in elf64 assembly for x86_64
-linux.
+This is an implementation of the basic POSIX command `echo` (it lacks the
+special formatting options the GNU version has) written in elf64 NASM assembly
+for x86_64 linux.
