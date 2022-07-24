@@ -30,7 +30,7 @@ NULL = 0x0
 
 ; the standard page size on linux is 0x1000 (4096) bytes
 ; if this is not the case on your system, the library may break,
-; or at least leave
+; or at least leave portions of pages above 4096 unused in some situations
 page_size = 0x1000
 
 ; minmum allocation size; the size of the freelist node structure
